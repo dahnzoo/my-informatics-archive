@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>정보교사합격 15분 랜덤미션 [낙서 인증판]</title>
+    <title>정보교사합격 15분 랜덤미션 [다중 누적판]</title>
     <style>
         body {
             font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
@@ -40,7 +40,6 @@
             align-items: center;
             margin-bottom: 40px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            position: relative;
         }
         .mission-day {
             font-size: 1.4rem;
@@ -57,20 +56,30 @@
             color: #000000;
             line-height: 1.6;
             word-break: keep-all;
+            margin-bottom: 20px;
         }
-        /* 낙서 이미지 미리보기 영역 스타일 */
-        .preview-box {
-            margin-top: 20px;
-            max-width: 100%;
-            display: none;
+        /* 🌟 변경된 다중 이미지 그리드 레이아웃 */
+        .doodle-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            width: 100%;
+            margin-top: 10px;
         }
-        .preview-box img {
-            max-width: 250px;
-            max-height: 250px;
+        .doodle-item {
             border: 3px dashed #000000;
             border-radius: 8px;
-            object-fit: contain;
             background-color: #ffffff;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .doodle-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
         .control-panel {
             display: flex;
@@ -133,7 +142,6 @@
         .btn-pick:hover {
             background-color: #222222;
         }
-        /* 실제 파일 선택창은 숨겨두고 스크립트로 트리거 */
         #hiddenFileInput {
             display: none;
         }
@@ -148,14 +156,14 @@
         <div class="mission-day" id="missionDayDisplay" style="display:none;">Day 0</div>
         <div class="mission-text" id="missionDisplay">아래 버튼을 눌러 오늘 뇌를 달래줄 15분 미션을 뽑아보세요!</div>
         
-        <div class="preview-box" id="previewBox">
-            <img id="imagePreview" src="" alt="나의 실전 낙서 인증">
-        </div>
+        <!-- 🌟 여러 개의 낙서가 누적되어 쌓이는 갤러리 영역 -->
+        <div class="doodle-gallery" id="doodleGallery"></div>
     </div>
 
     <button class="btn-pick" onclick="pickRandomMission()">🎰 미션 스타트</button>
 
-    <input type="file" id="hiddenFileInput" accept="image/*" onchange="previewDoodle(this)">
+    <!-- 🌟 multiple 속성을 추가하여 한 번에 여러 장 선택도 가능하게 업그레이드 -->
+    <input type="file" id="hiddenFileInput" accept="image/*" multiple onchange="previewMultipleDoodles(this)">
 
     <div class="control-panel">
         <div class="today-section">
@@ -173,25 +181,15 @@
 
 <script>
     const missionPool = [];
-    const subjects = [
-        "컴퓨터구조 및 논리회로 단원",
-        "운영체제 커널 및 스케줄링 단원",
-        "데이터베이스 정규화 및 병행제어 단원",
-        "자료구조 알고리즘 및 트리·그래프 탐색 단원",
-        "데이터통신 프로토콜 및 혼잡제어·서브네팅 단원",
-        "소프트웨어공학 방법론 및 SOLID 설계 원칙 단원",
-        "인공지능 퍼셉트론 및 역전파 오차 연산 단원",
-        "교직 교육학 발달이론 및 교수설계·문항분석 단원"
-    ];
-
+    const subjects = ["컴퓨터구조 및 논리회로 단원", "운영체제 커널 및 스케줄링 단원", "데이터베이스 정규화 및 병행제어 단원", "자료구조 알고리즘 및 트리·그래프 탐색 단원", "데이터통신 프로토콜 및 혼잡제어·서브네팅 단원", "소프트웨어공학 방법론 및 SOLID 설계 원칙 단원", "인공지능 퍼셉트론 및 역전파 오차 연산 단원", "교직 교육학 발달이론 및 교수설계·문항분석 단원"];
     const stages = [
-        { name: "1단계: 뇌 속이기 (시동기)", start: 1, end: 40, actions: ["전공서 목차 딱 3분간 가볍게 훑어보기", "교재 속 핵심 도해 그림 눈으로 구경하기", "요약집 요점 문장 딱 2개만 찾아 밑줄 긋기", "기출문제집 펼쳐서 정답 안 풀고 출제 배점만 확인하기", "개발 환경(IDE) 실행하고 빈 화면 3분간 응시하기", "인터넷 요약 인강 클립 딱 10분만 재생하기", "핵심 단어 요약본 딱 1 페이지만 소리 내어 편하게 읽기", "구조의 기본 스케치 형태를 연습장에 낙서하듯 그려보기"], logic: "인지적 구두쇠인 뇌의 브레이크를 푸는 단계" },
-        { name: "2단계: 발가락 담그기 (기초 인풋)", start: 41, end: 90, actions: ["구조도 결선 흐름 화살표 직접 정밀하게 따라 그리기", "핵심 전개 원리를 요약 노트에 딱 3줄로 정리해 적기", "기본 정의 문장을 소리 내어 3번 낭독하며 메타인지 깨우기", "매커니즘의 상태 전이 전후 비교 테이블 직접 채워보기", "핵심 수식 속에 들어가는 매개변수 종류 노트에 받아 적기", "기출에 반복 출제된 핵심 지형 용어 개념 사전 검색하기", "연산 수행 시 포인터와 인덱스 변화 조건식 적어보기", "계층별 주요 프로토콜 역할 앞 글자 따서 암기 노트 만들기"], logic: "본격 인풋을 위해 손과 입을 움직이는 단계" },
-        { name: "3단계: 가속도 붙이기 (강도 향상)", start: 91, end: 150, actions: ["특정 예외 조건 하에서의 수식을 유도하고 직접 계산하기", "두 핵심 알고리즘의 결정적인 구조적 차이점 기술하기", "기출지 지문 속에서 정규화 및 설계 위반 사례 찾아내기", "에러 검출 다항식 제수를 이용한 나머지 연산 직접 풀기", "주어진 가상 IP 데이터를 기반으로 서브넷 마스크 연산하기", "최악 및 최선의 상황을 대입하여 시간복잡도 수식 도출하기", "트랜잭션 ACID 특성 만족 여부를 기출 케이스로 분석하기", "메모리 주소 참조 및 제어 변환 메커니즘 순서도 그리기"], logic: "단일 기출 분석을 통해 연산 회로를 켜는 단계" },
-        { name: "4단계: 융합과 응용 (학습 전이)", start: 151, end: 220, actions: ["데이터 전송 중 오류 지연 방지를 위한 패킷 규격 직접 설계하기", "하드웨어 제어 시퀀스와 운영체제 커널 인터럽트 흐름 연결하기", "자료구조 충돌 해결 방식과 DB 인덱스 구조의 연계성 검토하기", "성취기준에 맞춰 프로그래밍 단원의 문제중심학습(PBL) 시나리오 구성하기", "시각 비전 데이터 파싱 후 모터 제어 신호로 변환하는 복합 흐름 쓰기", "동시성 제어 메커니즘과 OS 프로세스 생성 기법 상호 매칭하기", "객체지향 설계 원칙(SOLID)의 위반 예시를 찾아 코드로 리팩토링하기", "네트워크 계층 패킷 캡슐화 과정을 성취기준 테이블과 일대일 대응하기"], logic: "지식 파편화를 막는 고차원 학습 전이 단계" },
-        { name: "5단계: 리스크 통제 (심화 디버깅)", start: 221, end: 280, actions: ["통신 단절 및 연산 지연 시 튕김 방지 예외 처리 코딩하기", "잘못 설정된 자원 할당 그래프 추적해 데드락 원인 디버깅하기", "동시성 제어 실패로 유발된 모순성 현상 로그 역추적해 고치기", "인덱스 오버플로우 방지용 나머지 연산자 제어 변수 버그 고치기", "혼잡 윈도우 크기가 급락하는 예외 수치 추적해 수정하기", "공유 변수 동시 수정 시 발생하는 경쟁 조건에 뮤텍스 락 배치하기", "메모리 누수가 발생하는 포인터 해제 누락 지점 디버깅하기", "가중치가 발산하는 오버슈팅 오류를 규제화 수식으로 바로잡기"], logic: "철저히 오류를 수정하는 완벽주의 회피 동기 단계" },
-        { name: "6단계: 교수 인지 발동 (아웃풋)", start: 281, end: 330, actions: ["가상의 고1 학생이 앞에 있다고 생각하고 15분 동안 쉽게 설명하기", "동료 교사에게 스터디 강의를 하듯 핵심 작동 차이를 판서하며 해설하기", "학생들에게 직관적인 현실 비유를 들어 큰 소리로 강의 스피치하기", "임용 2차 면접관 앞이라 생각하고 정연한 논리로 15분 동안 구술하기", "공장의 컨베이어 벨트나 은행원 예시에 빗대어 허공에 대고 독강하기", "2차 수업실연 만능 틀 시나리오 카드에 맞춰 소리 내어 시뮬레이션하기", "중학생 수준에 맞춰 소스 코드의 제어 구조 동작 원리 읊어주기", "핵심 메커니즘의 인과관계를 가상의 칠판에 적어가며 독백 강의하기"], logic: "남에게 말하며 메타인지를 폭발시키는 강력한 아웃풋 단계" },
-        { name: "7단계: 최종 아카이빙 (브랜드화)", start: 331, end: 365, actions: ["그동안 쌓은 서브노트 조각들을 정보과 내용 체계 구조와 최종 매칭하기", "주제별 기출 오답 지문들을 중단원 폴더 인덱스로 편철해 스크랩하기", "설계했던 복합 시스템 소스 코드들을 디버깅 사례집 형태로 정돈하기", "가상 강의 자료들을 교수학습 과정안의 전개 단계 에셋으로 아카이빙하기", "학생 배포용 인포그래픽 시각 자료로 레이블링하여 폴더에 저장하기", "1년간 모아온 미션 완료 체크 표시들을 보며 엄청난 임무 수행력 확인하기", "면접장 책상에 들고 들어갈 15분 압축 요약본 바인더 최종 제본하기", "가장 큰 격려와 확신을 건네며 합격 후 폼나게 출근할 내 모습을 확정하기"], logic: "지식을 합격 포트폴리오로 최종 박제하고 마무리하는 단계" }
+        { name: "1단계: 뇌 속이기 (시동기)", start: 1, end: 40, actions: ["전공서 목차 딱 3분간 가볍게 훑어보기", "교재 속 핵심 도해 그림 눈으로 구경하기", "요약집 요점 문장 딱 2개만 찾아 밑줄 긋기", "기출문제집 펼쳐서 정답 안 풀고 출제 배점만 확인하기", "개발 환경(IDE) 실행하고 빈 화면 3분간 응시하기", "인터넷 요약 인강 클립 딱 10분만 재생하기", "핵심 단어 요약본 딱 1 페이지만 소리 내어 편하게 읽기", "구조의 기본 스케치 형태를 연습장에 낙서하듯 그려보기"] },
+        { name: "2단계: 발가락 담그기 (기초 인풋)", start: 41, end: 90, actions: ["구조도 결선 흐름 화살표 직접 정밀하게 따라 그리기", "핵심 전개 원리를 요약 노트에 딱 3줄로 정리해 적기", "기본 정의 문장을 소리 내어 3번 낭독하며 메타인지 깨우기", "매커니즘의 상태 전이 전후 비교 테이블 직접 채워보기", "핵심 수식 속에 들어가는 매개변수 종류 노트에 받아 적기", "기출에 반복 출제된 핵심 지형 용어 개념 사전 검색하기", "연산 수행 시 포인터와 인덱스 변화 조건식 적어보기", "계층별 주요 프로토콜 역할 앞 글자 따서 암기 노트 만들기"] },
+        { name: "3단계: 가속도 붙이기 (강도 향상)", start: 91, end: 150, actions: ["특정 예외 조건 하에서의 수식을 유도하고 직접 계산하기", "두 핵심 알고리즘의 결정적인 구조적 차이점 기술하기", "기출지 지문 속에서 정규화 및 설계 위반 사례 찾아내기", "에러 검출 다항식 제수를 이용한 나머지 연산 직접 풀기", "주어진 가상 IP 데이터를 기반으로 서브넷 마스크 연산하기", "최악 및 최선의 상황을 대입하여 시간복잡도 수식 도출하기", "트랜잭션 ACID 특성 만족 여부를 기출 케이스로 분석하기", "메모리 주소 참조 및 제어 변환 메커니즘 순서도 그리기"] },
+        { name: "4단계: 융합과 응용 (학습 전이)", start: 151, end: 220, actions: ["데이터 전송 중 오류 지연 방지를 위한 패킷 규격 직접 설계하기", "하드웨어 제어 시퀀스와 운영체제 커널 인터럽트 흐름 연결하기", "자료구조 충돌 해결 방식과 DB 인덱스 구조의 연계성 검토하기", "성취기준에 맞춰 프로그래밍 단원의 문제중심학습(PBL) 시나리오 구성하기", "시각 비전 데이터 파싱 후 모터 제어 신호로 변환하는 복합 흐름 쓰기", "동시성 제어 메커니즘과 OS 프로세스 생성 기법 상호 매칭하기", "객체지향 설계 원칙(SOLID)의 위반 예시를 찾아 코드로 리팩토링하기", "네트워크 계층 패킷 캡슐화 과정을 성취기준 테이블과 일대일 대응하기"] },
+        { name: "5단계: 리스크 통제 (심화 디버깅)", start: 221, end: 280, actions: ["통신 단절 및 연산 지연 시 튕김 방지 예외 처리 코딩하기", "잘못 설정된 자원 할당 그래프 추적해 데드락 원인 디버깅하기", "동시성 제어 실패로 유발된 모순성 현상 로그 역추적해 고치기", "인덱스 오버플로우 방지용 나머지 연산자 제어 변수 버그 고치기", "혼잡 윈도우 크기가 급락하는 예외 수치 추적해 수정하기", "공유 변수 동시 수정 시 발생하는 경쟁 조건에 뮤텍스 락 배치하기", "메모리 누수가 발생하는 포인터 해제 누락 지점 디버깅하기", "가중치가 발산하는 오버슈팅 오류를 규제화 수식으로 바로잡기"] },
+        { name: "6단계: 교수 인지 발동 (아웃풋)", start: 281, end: 330, actions: ["가상의 고1 학생이 앞에 있다고 생각하고 15분 동안 쉽게 설명하기", "동료 교사에게 스터디 강의를 하듯 핵심 작동 차이를 판서하며 해설하기", "학생들에게 직관적인 현실 비유를 들어 큰 소리로 강의 스피치하기", "임용 2차 면접관 앞이라 생각하고 정연한 논리로 15분 동안 구술하기", "공장의 컨베이어 벨트나 은행원 예시에 빗대어 허공에 대고 독강하기", "2차 수업실연 만능 틀 시나리오 카드에 맞춰 소리 내어 시뮬레이션하기", "중학생 수준에 맞춰 소스 코드의 제어 구조 동작 원리 읊어주기", "핵심 메커니즘의 인과관계를 가상의 칠판에 적어가며 독백 강의하기"] },
+        { name: "7단계: 최종 아카이빙 (브랜드화)", start: 331, end: 365, actions: ["그동안 쌓은 서브노트 조각들을 정보과 내용 체계 구조와 최종 매칭하기", "주제별 기출 오답 지문들을 중단원 폴더 인덱스로 편철해 스크랩하기", "설계했던 복합 시스템 소스 코드들을 디버깅 사례집 형태로 정돈하기", "가상 강의 자료들을 교수학습 과정안의 전개 단계 에셋으로 아카이빙하기", "학생 배포용 인포그래픽 시각 자료로 레이블링하여 폴더에 저장하기", "1년간 모아온 미션 완료 체크 표시들을 보며 엄청난 임무 수행력 확인하기", "면접장 책상에 들고 들어갈 15분 압축 요약본 바인더 최종 제본하기", "가장 큰 격려와 확신을 건네며 합격 후 폼나게 출근할 내 모습을 확정하기"] }
     ];
 
     function buildComplete365Database() {
@@ -199,12 +197,10 @@
             const stage = stages.find(s => day >= s.start && day <= s.end);
             const subjectIdx = (day - 1) % subjects.length;
             const actionIdx = (day - 1) % stage.actions.length;
-            
             missionPool.push({
                 day: day,
                 stageName: stage.name,
-                text: `🎯 [전공/교육학 미션] \n${subjects[subjectIdx]}의 핵심 이론을 기반으로, 오늘 딱 15분간 [${stage.actions[actionIdx]}]를 실천하세요.`,
-                logic: stage.logic
+                text: `🎯 [전공/교육학 미션] \n${subjects[subjectIdx]}의 핵심 이론을 기반으로, 오늘 딱 15분간 [${stage.actions[actionIdx]}]를 실천하세요.`
             });
         }
     }
@@ -218,23 +214,15 @@
     function pickRandomMission() {
         if (missionPool.length === 0) return;
         
-        // 새로운 미션을 뽑을 때 기존에 등록된 낙서 이미지 숨기기 및 초기화
-        document.getElementById('previewBox').style.display = "none";
-        document.getElementById('imagePreview').src = "";
-        document.getElementById('hiddenFileInput').value = "";
-
+        // 🌟 새 미션을 뽑아도 기존에 등록해 둔 낙서 갤러리는 유지됩니다. (지우고 싶다면 innerHTML = "" 처리 가능)
         const randomIndex = Math.floor(Math.random() * missionPool.length);
         const mission = missionPool[randomIndex];
         
-        const dayBox = document.getElementById('missionDayDisplay');
-        const textBox = document.getElementById('missionDisplay');
-        
-        dayBox.style.display = "inline-block";
-        dayBox.innerText = `Day ${mission.day} ➔ ${mission.stageName}`;
-        textBox.innerText = `${mission.text}\n\n(💡 인지 팁: ${mission.logic})`;
+        document.getElementById('missionDayDisplay').style.display = "inline-block";
+        document.getElementById('missionDayDisplay').innerText = `Day ${mission.day} ➔ ${mission.stageName}`;
+        document.getElementById('missionDisplay').innerText = mission.text;
     }
 
-    // 🌟 Ok(Yes)를 선택했을 때 파일 시스템 첨부 창을 즉각 활성화하는 코어 디버깅 로직
     function handleResponse(status) {
         const currentMission = document.getElementById('missionDisplay').innerText;
         if(currentMission.includes("아래 버튼을 눌러")) {
@@ -243,29 +231,41 @@
         }
 
         if (status === 'Ok') {
-            // 숨겨진 input[type=file]을 코드 단에서 강제 클릭 제어(Trigger)하여 첨부창 호출
             document.getElementById('hiddenFileInput').click();
         } else {
-            alert("☕ 괜찮습니다! 만족할 줄 아는 인간(Satisficer)이 되어 내일 다시 가방을 싸서 문밖으로 나갑시다.");
+            alert("☕ 괜찮습니다! 만족할 줄 아는 인간(Satisficer)이 되어 내일 다시 한 걸음 나아갑시다.");
         }
     }
 
-    // 선택한 낙서 사진 파일 읽기(FileReader API) 및 스크린 렌더링
-    function previewDoodle(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
+    // 🌟 새로운 이미지를 기존 리스트 뒤에 계속 '추가(Append)'하는 핵심 디버깅 함수
+    function previewMultipleDoodles(input) {
+        if (input.files && input.files.length > 0) {
+            const gallery = document.getElementById('doodleGallery');
             
-            reader.onload = function(e) {
-                document.getElementById('imagePreview').src = e.target.result;
-                document.getElementById('previewBox').style.display = "block";
+            // 선택한 모든 파일을 루프 돌며 순차적으로 화면에 추가
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
                 
-                // 이미지 업로드가 끝난 시점에 인지학적 성취 보상 피드백 출력
-                setTimeout(() => {
-                    alert("🎉 낙서 인증 완료! 뇌에 완벽한 즉각적 보상이 부여되었습니다. 수고하셨습니다!");
-                }, 100);
-            };
+                reader.onload = function(e) {
+                    // 1. 새로운 카드 틀 생성
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'doodle-item';
+                    
+                    // 2. 새로운 이미지 태그 생성 및 소스 바인딩
+                    const imgTag = document.createElement('img');
+                    imgTag.src = e.target.result;
+                    
+                    // 3. 조립 및 조각 갤러리에 추가
+                    itemDiv.appendChild(imgTag);
+                    gallery.appendChild(itemDiv);
+                };
+                
+                reader.readAsDataURL(file);
+            });
             
-            reader.readAsDataURL(input.files[0]);
+            setTimeout(() => {
+                alert("🎉 낙서가 누적되었습니다! 뇌에 성공적인 즉각적 보상이 추가되었습니다.");
+            }, 100);
         }
     }
 
