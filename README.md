@@ -11,20 +11,18 @@
 모든 성찰과 성장의 기록은 아래 블로그에서 확인하실 수 있습니다.
 [👉 단주쌤의 성찰과 성장 블로그 바로가기](https://dahnzoo.blogspot.com/p/blog-page_12.html)
 
----
 
-## 🎨 프로젝트 브랜딩: 빨간 말 MC
-구구단 프로젝트를 시작으로, 기술에 정체성을 입히는 브랜딩 과정을 담고 있습니다.
+<!--2. 하단 고정 이미지 5분할 링크 영역 (안정적인 방식)-->
+<div style="margin: 30px auto; max-width: 1000px; position: relative; text-align: center;">
+    <!--배경 이미지-->
+    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiaKSL_hpN068B4sy1-P6pexQHzSpYQo1MPXbPcdV4xmu36CvKlwv7o3ySfJ1Ob2pW1dintbBf3BVPwtIWrfUBDqlUpUBlObuwDKU0u2UdmRHl228LUVyPADl66lJmK8VBGYyspa9TV0RradjPuea4kBcxwT-SSHhJ0-EIvvoFFNMAfcvs8K4xUNC4clag/s1600/%EC%BD%94%EB%94%A9%EC%98%88%EC%A0%9C%EB%93%A4.jpeg" style="display: block; height: auto; width: 100%;" />
 
-(이 아래에 빨간 말 이모티콘 5종을 가로로 배치하세요)
-[안녕] [고민] [코딩] [완성] [오류]
-
----
-
-## 📁 주요 프로젝트 (Level)
-블로그 하단과 연결된 프로젝트 리스트입니다.
-- **[Level 1: 구구단 프로젝트]**
-- **[Level 2 ~ 5: 로컬 프로젝트 및 아카이브]**
-
----
-*영원한 직장은 없어도, 나만의 브랜드는 남습니다.*
+    <!--5개로 분할된 링크 레이어-->
+    <div style="display: flex; height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;">
+        <a href="https://dahnzoo.blogspot.com/p/level1.html" style="flex: 1 1 0%;"></a>
+        <a href="https://dahnzoo.blogspot.com/p/level2.html" style="flex: 1 1 0%;"></a>
+        <a href="https://dahnzoo.blogspot.com/p/level3.html" style="flex: 1 1 0%;"></a>
+        <a href="https://dahnzoo.blogspot.com/p/blog-page_17.html" style="flex: 1 1 0%;"></a>
+        <a href="https://dahnzoo.blogspot.com/p/level5.html" style="flex: 1 1 0%;"></a>
+    </div>
+    </div>
